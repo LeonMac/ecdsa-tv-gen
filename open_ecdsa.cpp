@@ -49,6 +49,12 @@ std::vector<uint8_t> Hash256(const std::string &str) {
   return md;
 }
 
+void char_array_display (const char* char_ptr, int size, const char* msg)
+{   for(int i = 0; i < size; i++)
+    cout  << std::setw(1) << std::setfill('0') << static_cast<char>(tolower(*(char_ptr+i)));
+    cout  << "  //" << msg <<   endl;
+}
+
 string sha256_string (const string str)
 {   unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
@@ -113,7 +119,8 @@ int main(int argc, char** argv)
     cout << "Hash256(message) " << Digest.size() << " byte" <<endl;
     std::cout << uint8_vector_to_hex_string(Digest) <<std::endl;
     //9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0
- 
+ for (uint32_t i=0; i<signature_number; i++)    {
+    printf("\n===========Signature body #%d of #%d ===============\n",i,signature_number);
     EC_KEY *ec_key = EC_KEY_new();
        if (ec_key == NULL)  {
         cout<< "Error happen for creating ECC key object!" <<endl;
@@ -135,16 +142,16 @@ int main(int argc, char** argv)
     //char *
 
     if (EC_POINT_get_affine_coordinates_GFp(ec_group, pub, Qx, Qy, NULL)) {
-        cout << "Pub key :\n";
-        cout << "Qx      : ";
-        BN_print_fp(stdout, Qx);
-        putc('\n', stdout);
-        cout << "Qy      : ";
-        BN_print_fp(stdout, Qy);
-        putc('\n', stdout);
-        cout << "Priv key: ";
-        BN_print_fp(stdout, privkey);
-        cout <<"\n";
+        cout << "Pub key generated:\n";
+        // cout << "Qx      : ";
+        // BN_print_fp(stdout, Qx);
+        // putc('\n', stdout);
+        // cout << "Qy      : ";
+        // BN_print_fp(stdout, Qy);
+        // putc('\n', stdout);
+        // cout << "Priv key: ";
+        // BN_print_fp(stdout, privkey);
+        // cout <<"\n";
     }
     
     ECDSA_SIG *signature;
@@ -172,14 +179,14 @@ int main(int argc, char** argv)
             }
 
     ECDSA_SIG_get0(signature, &pr, &ps);
-        cout << "Sig   :\n";
-        cout << "Sig.r : ";
-        BN_print_fp(stdout, pr);
-        putc('\n', stdout);
-        cout << "Sig.s : ";
-        BN_print_fp(stdout, ps);
-        putc('\n', stdout);
-        putc('\n', stdout);
+        // cout << "Sig   :\n";
+        // cout << "Sig.r : ";
+        // BN_print_fp(stdout, pr);
+        // putc('\n', stdout);
+        // cout << "Sig.s : ";
+        // BN_print_fp(stdout, ps);
+        // putc('\n', stdout);
+        // putc('\n', stdout);
 
     //char *BN_bn2hex(const BIGNUM *a);
     // Signature_R.data()= BN_bn2hex (pr);
@@ -187,38 +194,22 @@ int main(int argc, char** argv)
     // char *BN_bn2dec(const BIGNUM *a);
 // Convert from BIGNUM to Hex String.
  //
-    cout << "================  low case disply  ===================\n";
-    cout << "Input Message is "<< mesg_string << std::endl;
+    // cout << "================  low case disply  ===================\n";
+    // cout << "Input Message is "<< mesg_string << std::endl;
     //cout << "Hash256(message) " << Digest.size() << " byte" <<endl;
-    std::cout << uint8_vector_to_hex_string(Digest) <<" //Digest" <<std::endl;
+    // std::cout << uint8_vector_to_hex_string(Digest) <<" //Digest" <<std::endl;
 
     char* Q_x   = BN_bn2hex(Qx);
     char* Q_y   = BN_bn2hex(Qy);
     char* sig_r = BN_bn2hex(pr);
     char* sig_s = BN_bn2hex(ps);
     //char* priv_key = BN_bn2hex(priv_key);
-        for(int i = 0; i < SIG_SIZE; i++)
-    {    
-        cout  << std::setw(1) << std::setfill('0') << static_cast<char>(tolower(*(sig_r+i)));
-    }
-        cout<< " //Sig.r" <<endl;
 
-    for(int i = 0; i < SIG_SIZE; i++)
-    {    
-        cout  << std::setw(1) << std::setfill('0') << static_cast<char>(tolower(*(sig_s+i)));
-    }
-        cout<< " //Sig.s" <<endl;
-
-     for(int i = 0; i < PUB_KEY_SIZE; i++)
-    {    
-        cout  << std::setw(1) << std::setfill('0') << static_cast<char>(tolower(*(Q_x+i)));
-    }
-        cout<< " //Qx" <<endl;
-    for(int i = 0; i < PUB_KEY_SIZE; i++)
-    {    
-        cout  << std::setw(1) << std::setfill('0') << static_cast<char>(tolower(*(Q_y+i)));
-    }
-        cout<< " //Qy" <<endl;
+    // char_array_display (sig_r,SIG_SIZE,"sig.r");
+    char_array_display (sig_r,SIG_SIZE,"sig.r");
+    char_array_display (sig_s,SIG_SIZE,"sig.s");
+    char_array_display (Q_x,   PUB_KEY_SIZE,"QX");
+    char_array_display (Q_y,   PUB_KEY_SIZE,"QY");
 
     // for(int i = 0; i < PRIV_KEY_SIZE; i++)
     // {    
@@ -243,6 +234,8 @@ int main(int argc, char** argv)
     sig_s = nullptr;
     Q_x   = nullptr;
     Q_y   = nullptr;
+    }//end of iteration;
+ 
 
     // BN_free(Qx);
     // BN_free(Qy);
