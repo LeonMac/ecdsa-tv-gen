@@ -1,6 +1,7 @@
 # ecdsa-tv-gen
-an ecdsa test vector generation tool by using openssl lib.
-compile: g++  open_ecdsa.cpp -o open -lssl -lcrypto -lstdc++
+An ecdsa test vector generation tool by using openssl lib.
 
-use exmaples: ./open 2 //generate 2 set of signatures.
+- compile: g++  open_ecdsa.cpp -o open -lssl -lcrypto -lstdc++
+
+- using exmaples: ./open 2 //generate 2 set of signatures.
  

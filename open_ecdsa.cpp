@@ -1,4 +1,4 @@
-//g++  open_ecdsa.cpp -o open -lssl -lcrypto -lstdc++
+//compile: g++  open_ecdsa.cpp -o open -lssl -lcrypto -lstdc++
 
 #include <openssl/ecdsa.h>
 #include <openssl/sha.h>
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
     std::cout << uint8_vector_to_hex_string(Digest) <<std::endl;
     //9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0
  for (uint32_t i=0; i<signature_number; i++)    {
-    printf("\n===========Signature body #%d of #%d ===============\n",i,signature_number);
+    printf("\n===========Signature body #%d of #%d ===============\n",i+1,signature_number);
     EC_KEY *ec_key = EC_KEY_new();
        if (ec_key == NULL)  {
         cout<< "Error happen for creating ECC key object!" <<endl;
@@ -136,21 +136,21 @@ int main(int argc, char** argv)
         }
     
     const EC_POINT *pub = EC_KEY_get0_public_key(ec_key);
-    const BIGNUM *privkey = EC_KEY_get0_private_key(ec_key);
-    BIGNUM *Qx = BN_new();
-    BIGNUM *Qy = BN_new();
+    const BIGNUM *PRIV  = EC_KEY_get0_private_key(ec_key);
+    BIGNUM *QX = BN_new();
+    BIGNUM *QY = BN_new();
     //char *
 
-    if (EC_POINT_get_affine_coordinates_GFp(ec_group, pub, Qx, Qy, NULL)) {
+    if (EC_POINT_get_affine_coordinates_GFp(ec_group, pub, QX, QY, NULL)) {
         cout << "Pub key generated:\n";
-        // cout << "Qx      : ";
-        // BN_print_fp(stdout, Qx);
+        // cout << "QX      : ";
+        // BN_print_fp(stdout, QX);
         // putc('\n', stdout);
-        // cout << "Qy      : ";
-        // BN_print_fp(stdout, Qy);
+        // cout << "QY      : ";
+        // BN_print_fp(stdout, QY);
         // putc('\n', stdout);
         // cout << "Priv key: ";
-        // BN_print_fp(stdout, privkey);
+        // BN_print_fp(stdout, PRIV);
         // cout <<"\n";
     }
     
@@ -161,8 +161,8 @@ int main(int argc, char** argv)
      {cout <<"Signature generation fail!\n";
         return false;
         }
-    const BIGNUM *pr = BN_new();
-    const BIGNUM *ps = BN_new();
+    const BIGNUM *R = BN_new();
+    const BIGNUM *S = BN_new();
 
     ret = ECDSA_do_verify(dig_ptr, SHA256_DIGEST_LENGTH, signature, ec_key);
     // ret = ECDSA_verify(0, digest, 32, buffer, buf_len, ec_key);
@@ -178,19 +178,19 @@ int main(int argc, char** argv)
             return false;
             }
 
-    ECDSA_SIG_get0(signature, &pr, &ps);
+    ECDSA_SIG_get0(signature, &R, &S);
         // cout << "Sig   :\n";
         // cout << "Sig.r : ";
-        // BN_print_fp(stdout, pr);
+        // BN_print_fp(stdout, R);
         // putc('\n', stdout);
         // cout << "Sig.s : ";
-        // BN_print_fp(stdout, ps);
+        // BN_print_fp(stdout, S);
         // putc('\n', stdout);
         // putc('\n', stdout);
 
     //char *BN_bn2hex(const BIGNUM *a);
-    // Signature_R.data()= BN_bn2hex (pr);
-    // Signature_S.data()= BN_bn2hex (ps);
+    // Signature_R.data()= BN_bn2hex (R);
+    // Signature_S.data()= BN_bn2hex (S);
     // char *BN_bn2dec(const BIGNUM *a);
 // Convert from BIGNUM to Hex String.
  //
@@ -199,17 +199,19 @@ int main(int argc, char** argv)
     //cout << "Hash256(message) " << Digest.size() << " byte" <<endl;
     // std::cout << uint8_vector_to_hex_string(Digest) <<" //Digest" <<std::endl;
 
-    char* Q_x   = BN_bn2hex(Qx);
-    char* Q_y   = BN_bn2hex(Qy);
-    char* sig_r = BN_bn2hex(pr);
-    char* sig_s = BN_bn2hex(ps);
-    //char* priv_key = BN_bn2hex(priv_key);
+    char* Q_x   = BN_bn2hex(QX);
+    char* Q_y   = BN_bn2hex(QY);
+    char* sig_r = BN_bn2hex(R);
+    char* sig_s = BN_bn2hex(S);
+    char* priv_key = BN_bn2hex(PRIV);
 
-    // char_array_display (sig_r,SIG_SIZE,"sig.r");
-    char_array_display (sig_r,SIG_SIZE,"sig.r");
-    char_array_display (sig_s,SIG_SIZE,"sig.s");
-    char_array_display (Q_x,   PUB_KEY_SIZE,"QX");
-    char_array_display (Q_y,   PUB_KEY_SIZE,"QY");
+    
+    char_array_display (sig_r,64,"sig.r");
+    char_array_display (sig_s,64,"sig.s");
+    char_array_display (Q_x,  64,"QX");
+    char_array_display (Q_y,  64,"QY");
+    printf("===============================================\n");
+    char_array_display (priv_key,64,"privkey");
 
     // for(int i = 0; i < PRIV_KEY_SIZE; i++)
     // {    
@@ -237,11 +239,11 @@ int main(int argc, char** argv)
     }//end of iteration;
  
 
-    // BN_free(Qx);
-    // BN_free(Qy);
-    // BN_free(pr);
-    // BN_free(ps);
-    // BN_free(privkey);
+    // BN_free(QX);
+    // BN_free(QY);
+    // BN_free(R);
+    // BN_free(S);
+    // BN_free(PRIV);
 
      return 0;
 }
